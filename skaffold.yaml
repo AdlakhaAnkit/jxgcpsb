@@ -1,0 +1,30 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  artifacts:
+  - image: changeme
+    context: .
+    docker: {}
+  tagPolicy:
+    envTemplate:
+      template: '{{.DOCKER_REGISTRY}}/adlakhaankit/ankit-ab2502:{{.VERSION}}'
+  local: {}
+deploy:
+  kubectl: {}
+profiles:
+- name: dev
+  build:
+    artifacts:
+    - docker: {}
+    tagPolicy:
+      envTemplate:
+        template: '{{.DOCKER_REGISTRY}}/adlakhaankit/ankit-ab2502:{{.DIGEST_HEX}}'
+    local: {}
+  deploy:
+    helm:
+      releases:
+      - name: ankit-ab2502
+        chartPath: charts/ankit-ab2502
+        setValueTemplates:
+          image.repository: '{{.DOCKER_REGISTRY}}/adlakhaankit/ankit-ab2502'
+          image.tag: '{{.DIGEST_HEX}}'
